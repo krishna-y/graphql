@@ -1,4 +1,8 @@
-type Vehicle {
+interface Entity{
+	id : ID!
+}
+
+type Vehicle{
 	id: ID!,
 	type: String,
 	modelCode: String,
@@ -6,11 +10,40 @@ type Vehicle {
 	launchDate: String
 }
 
+type House{
+	id: ID!,
+	city: String,
+	address: String,
+}
+
+type Person implements Entity{
+	id : ID!,
+	name : String,
+	vehicles : [Vehicle!],
+	houses : [House!]
+}
+
+type Organization implements Entity{
+	id : ID!,
+	name : String,
+	vehicles : [Vehicle!],
+}
+
 type Query {
 	vehicles(count: Int):[Vehicle]
 	vehicle(id: ID):Vehicle
+	persons(count: Int):[Person]
+	person(id: ID):Person
+	houses(count: Int):[House]
+	house(id: ID):House
+	organization(id: ID):Organization
+	getEntities(count: Int) : [Entity]
 }
 
 type Mutation {
 	createVehicle(type: String!, modelCode: String!, brandName: String, launchDate: String):Vehicle
+	addPerson(name: String!, vehicles : [ID]!, housese : [ID]!) : Person,
+	createHouse(city: String!, address : String!) : House
+	addOrganization(name: String!, vehicles : [ID]!) : Organization,
+
 }

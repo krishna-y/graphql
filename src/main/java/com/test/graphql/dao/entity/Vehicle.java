@@ -1,7 +1,9 @@
-package com.techshard.graphql.dao.entity;
+package com.test.graphql.dao.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,6 +12,8 @@ import java.time.LocalDate;
 @Data
 @EqualsAndHashCode
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class Vehicle implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -1,8 +1,8 @@
-package com.techshard.graphql.query;
+package com.test.graphql.query;
 
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
-import com.techshard.graphql.dao.entity.Vehicle;
-import com.techshard.graphql.service.VehicleService;
+import com.test.graphql.dao.entity.Vehicle;
+import com.test.graphql.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
