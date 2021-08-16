@@ -40,4 +40,8 @@ public class OrganizationResolver implements GraphQLResolver<Organization> {
             return v;
         }, executorService);
     }
+
+    public String name(Organization organization){
+        return "Custom Scalar Prefix : "  + organization.getName();
+    }
 }
