@@ -33,4 +33,8 @@ public class Person implements Serializable {
     @Column(name = "houseIds", nullable = false)
     @ElementCollection(targetClass=Integer.class)
     private List<Integer> houseIds;
+
+    @Column(name = "friendIds", nullable = false)
+    @ElementCollection(targetClass=Integer.class)
+    private List<Integer> friendIds;
 }

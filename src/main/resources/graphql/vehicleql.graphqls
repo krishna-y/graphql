@@ -20,7 +20,8 @@ type Person implements Entity{
 	id : ID!,
 	name : String,
 	vehicles : [Vehicle!],
-	houses : [House!]
+	houses : [House!],
+	friends : [Person]!
 }
 
 type Organization implements Entity{

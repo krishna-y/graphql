@@ -1,10 +1,18 @@
 package com.test.graphql;
 
+import com.test.graphql.context.DataLoaderRegistryFactory;
 import com.test.graphql.dao.entity.Organization;
 import com.test.graphql.dao.entity.Person;
+import com.test.graphql.dao.repository.PersonRepository;
 import graphql.GraphQL;
+import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentation;
+import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentationOptions;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.*;
+import org.dataloader.BatchLoader;
+import org.dataloader.DataLoader;
+import org.dataloader.DataLoaderRegistry;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,6 +22,12 @@ import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 /*
 1. Things can be made parallel for different resolvers
@@ -91,6 +105,9 @@ public class Application extends SpringBootServletInitializer {
     @Value("classpath:graphql/vehicleql.graphqls")
     Resource resource;
 
+    @Autowired
+    PersonRepository personRepository;
+
     public static void main(String[] args) {
 
         SpringApplication.run(Application.class, args);
@@ -115,9 +132,13 @@ public class Application extends SpringBootServletInitializer {
                         }))
                 .build();
 
-
+        DataLoaderDispatcherInstrumentationOptions options = DataLoaderDispatcherInstrumentationOptions
+                .newOptions().includeStatistics(true);
         SchemaGenerator generator = new SchemaGenerator();
         GraphQLSchema graphQLSchema = generator.makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);
-        return GraphQL.newGraphQL(graphQLSchema).build();
+        return GraphQL.newGraphQL(graphQLSchema)
+                .build();
     }
+
+
 }

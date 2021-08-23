@@ -30,6 +30,12 @@ public class HouseService {
         return this.houseRepository.findAll().stream().limit(count).collect(Collectors.toList());
     }
 
+    public List<House> getAllHouses(List<Integer> houseIds) {
+        return houseIds.stream()
+                .map(houseRepository::getHouse)
+                .collect(Collectors.toList());
+    }
+
     public Optional<House> getHouse(final int id) {
         if(this.houseRepository.getHouse(id) == null){
             return Optional.empty();

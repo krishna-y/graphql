@@ -1,8 +1,8 @@
 package com.test.graphql.mutation;
 
-import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import com.test.graphql.dao.entity.Vehicle;
 import com.test.graphql.service.VehicleService;
+import graphql.kickstart.tools.GraphQLMutationResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

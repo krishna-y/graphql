@@ -1,9 +1,9 @@
 package com.test.graphql.resolvers;
 
-import com.coxautodev.graphql.tools.GraphQLResolver;
 import com.test.graphql.dao.entity.Organization;
 import com.test.graphql.dao.entity.Vehicle;
 import com.test.graphql.dao.repository.VehicleRepository;
+import graphql.kickstart.tools.GraphQLResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +25,7 @@ public class OrganizationResolver implements GraphQLResolver<Organization> {
 
     public CompletableFuture<List<Vehicle>> vehicles(Organization organization) {
         return CompletableFuture.supplyAsync(() -> {
-            System.out.println(Thread.currentThread().getName() + " Organization Vehicle Thread Start");
+//            System.out.println(Thread.currentThread().getName() + " Organization Vehicle Thread Start");
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -36,7 +36,7 @@ public class OrganizationResolver implements GraphQLResolver<Organization> {
             for (int i = 0; i < vehicleIds.size(); i++) {
                 v.add(vehicleRepository.getVehicle(vehicleIds.get(i)));
             }
-            System.out.println(Thread.currentThread().getName() + " Organiation Vehicle Thread End");
+//            System.out.println(Thread.currentThread().getName() + " Organiation Vehicle Thread End");
             return v;
         }, executorService);
     }

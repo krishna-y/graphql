@@ -1,8 +1,8 @@
 package com.test.graphql.query;
 
-import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.test.graphql.service.OrganizationService;
 import com.test.graphql.service.PersonService;
+import graphql.kickstart.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

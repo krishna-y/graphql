@@ -1,12 +1,16 @@
 package com.test.graphql.resolvers;
 
-import com.coxautodev.graphql.tools.GraphQLResolver;
+import com.test.graphql.context.DataLoaderRegistryFactory;
 import com.test.graphql.dao.entity.House;
 import com.test.graphql.dao.entity.Person;
 import com.test.graphql.dao.entity.Vehicle;
 import com.test.graphql.dao.repository.HouseRepository;
 import com.test.graphql.dao.repository.PersonRepository;
 import com.test.graphql.dao.repository.VehicleRepository;
+import graphql.GraphQL;
+import graphql.kickstart.tools.GraphQLResolver;
+import graphql.schema.DataFetchingEnvironment;
+import org.dataloader.DataLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,9 +36,17 @@ public class PersonResolver implements GraphQLResolver<Person> {
         this.houseRepository = houseRepository;
     }
 
+    public CompletableFuture<List<Person>> friends(Person person,
+                                                   DataFetchingEnvironment dataFetchingEnvironment){
+//        System.out.println("Friends Thread + " + person.getName());
+        DataLoader<Integer, Person> person_data_loader = dataFetchingEnvironment
+                .getDataLoader("PERSON_DATA_LOADER");
+        return person_data_loader.loadMany(person.getFriendIds());
+    }
+
     public CompletableFuture<List<Vehicle>> vehicles(Person person) {
         return CompletableFuture.supplyAsync(() -> {
-            System.out.println(Thread.currentThread().getName() + "Person Vehicle Thread Start");
+//            System.out.println(Thread.currentThread().getName() + "Person Vehicle Thread Start");
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -45,12 +57,13 @@ public class PersonResolver implements GraphQLResolver<Person> {
             for (int i = 0; i < vehicleIds.size(); i++) {
                 v.add(vehicleRepository.getVehicle(vehicleIds.get(i)));
             }
-            System.out.println(Thread.currentThread().getName() + "Persone Vehicle Thread End");
+//            System.out.println(Thread.currentThread().getName() + "Persone Vehicle Thread End");
             return v;
         }, executorService);
     }
 
     public CompletableFuture<List<House>> houses(Person person) {
+
         return CompletableFuture.supplyAsync(() -> {
             System.out.println(Thread.currentThread().getName() + "Person House Thread Start");
             try {
