@@ -13,6 +13,7 @@ import com.test.graphql.service.VehicleService;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentationOptions;
+import graphql.schema.AsyncDataFetcher;
 import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.*;
@@ -22,6 +23,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,7 +71,6 @@ public class BechmarkLoop {
     @Setup
     public void setup() throws IOException {
 
-
         this.vehicleRepository = new VehicleRepository();
         vehicleRepository.addVehicle(new Vehicle(1, "hatchback", "nano", "tata",
                 LocalDate.now(), "2020"));
@@ -96,7 +97,7 @@ public class BechmarkLoop {
                 .type(newTypeWiring("Query")
                         .dataFetcher("organizations", organizationQuery.getOrganizations()))
                 .type(newTypeWiring("Organization")
-                        .dataFetcher("vehicles", organizationResolver.vehicles()))
+                        .dataFetcher("vehicles", AsyncDataFetcher.async(organizationResolver.vehicles())))
                 .build();
 
         DataLoaderDispatcherInstrumentationOptions options = DataLoaderDispatcherInstrumentationOptions
@@ -131,6 +132,7 @@ public class BechmarkLoop {
                 "    vehicles,\n" +
                 "    }\n" +
                 "}");
+        Object data = execute.getData();
         bh.consume(execute);
     }
 
