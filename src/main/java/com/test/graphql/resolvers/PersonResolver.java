@@ -47,11 +47,6 @@ public class PersonResolver implements GraphQLResolver<Person> {
     public CompletableFuture<List<Vehicle>> vehicles(Person person) {
         return CompletableFuture.supplyAsync(() -> {
 //            System.out.println(Thread.currentThread().getName() + "Person Vehicle Thread Start");
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             List<Integer> vehicleIds = person.getVehicleIds();
             List<Vehicle> v = new ArrayList<>();
             for (int i = 0; i < vehicleIds.size(); i++) {
@@ -66,11 +61,6 @@ public class PersonResolver implements GraphQLResolver<Person> {
 
         return CompletableFuture.supplyAsync(() -> {
             System.out.println(Thread.currentThread().getName() + "Person House Thread Start");
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             List<Integer> houseIds = person.getHouseIds();
             List<House> h = new ArrayList<>();
             for (int i = 0; i < houseIds.size(); i++) {

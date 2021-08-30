@@ -26,11 +26,6 @@ public class OrganizationResolver implements GraphQLResolver<Organization> {
     public CompletableFuture<List<Vehicle>> vehicles(Organization organization) {
         return CompletableFuture.supplyAsync(() -> {
 //            System.out.println(Thread.currentThread().getName() + " Organization Vehicle Thread Start");
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             List<Integer> vehicleIds = organization.getVehicleIds();
             List<Vehicle> v = new ArrayList<>();
             for (int i = 0; i < vehicleIds.size(); i++) {
