@@ -4,9 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.test.graphql.dao.entity.Organization;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class OrganizationRepository {
@@ -29,7 +28,7 @@ public class OrganizationRepository {
         return organizationMap.get(id);
     }
 
-    public Collection<Organization> findAll(){
-        return organizationMap.values();
+    public List<Organization> findAll(){
+        return new ArrayList<>(organizationMap.values());
     }
 }

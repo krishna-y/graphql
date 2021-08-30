@@ -6,7 +6,9 @@ import com.test.graphql.dao.entity.Vehicle;
 import com.test.graphql.dao.repository.OrganizationRepository;
 import com.test.graphql.dao.repository.PersonRepository;
 import com.test.graphql.dao.repository.VehicleRepository;
+import com.test.graphql.query.OrganizationQuery;
 import com.test.graphql.query.VehicleQuery;
+import com.test.graphql.resolvers.OrganizationResolver;
 import com.test.graphql.service.VehicleService;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -38,7 +40,7 @@ import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 /*
 http://hg.openjdk.java.net/code-tools/jmh/file/tip/jmh-samples/src/main/java/org/openjdk/jmh/samples/
 */
-@BenchmarkMode(Mode.SingleShotTime)
+@BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(Scope.Benchmark)
 @Fork(value = 2, jvmArgs = {"-Xms2G", "-Xmx2G"})
@@ -49,6 +51,8 @@ public class BechmarkLoop {
 
     private GraphQL graphQL;
     private VehicleQuery vehicleQuery;
+    private OrganizationQuery organizationQuery;
+    private OrganizationResolver organizationResolver;
 
     private List<String> DATA_FOR_TESTING;
 
@@ -71,10 +75,10 @@ public class BechmarkLoop {
                 LocalDate.now(), "2020"));
         VehicleService vehicleService = new VehicleService(vehicleRepository);
         vehicleQuery = new VehicleQuery(vehicleService);
-
-        File schemaFile = new File("/Users/krishnatejay/Downloads/vehicleql.graphqls");
+        this.organizationQuery = new OrganizationQuery(new OrganizationRepository());
+        this.organizationResolver = new OrganizationResolver(vehicleRepository);
         SchemaParser schemaParser = new SchemaParser();
-        TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(schemaFile);
+        TypeDefinitionRegistry typeDefinitionRegistry = schemaParser.parse(getSchema());
         RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
                 .type(newTypeWiring("Entity")
                         .typeResolver(env -> {
@@ -89,6 +93,10 @@ public class BechmarkLoop {
                         }))
                 .type(newTypeWiring("Query")
                         .dataFetcher("vehicles", vehicleQuery.getVehicles()))
+                .type(newTypeWiring("Query")
+                        .dataFetcher("organizations", organizationQuery.getOrganizations()))
+                .type(newTypeWiring("Organization")
+                        .dataFetcher("vehicles", organizationResolver.vehicles()))
                 .build();
 
         DataLoaderDispatcherInstrumentationOptions options = DataLoaderDispatcherInstrumentationOptions
@@ -103,22 +111,65 @@ public class BechmarkLoop {
     }
 
     @Benchmark
-    public void runEntireQuery(Blackhole bh) {
+    public void runVehicleQuery(Blackhole bh) {
 
         ExecutionResult execute = graphQL.execute("query{\n" +
                 " vehicles{\n" +
                 "    id,\n" +
-                "    launchDate\n" +
                 "    }\n" +
                 "}");
-//        System.out.println(execute.getData().toString());
         bh.consume(execute);
     }
 
-//    @Benchmark
-    public void onlyResolver(Blackhole bh) {
+    @Benchmark
+    public void runOrganizationQuery(Blackhole bh) {
+
+        ExecutionResult execute =  graphQL.execute("query{\n" +
+                " organizations{\n" +
+                "    id,\n" +
+                "    name,\n" +
+                "    vehicles,\n" +
+                "    }\n" +
+                "}");
+        bh.consume(execute);
+    }
+
+    @Benchmark
+    public void runOnlyOrganizationResolver(Blackhole bh) throws Exception {
+        DataFetcher organizations = organizationQuery.getOrganizations();
+        Object o = organizations.get(null);
+//        System.out.println(o);
+        bh.consume(o);
+    }
+
+    @Benchmark
+    public void runOnlyVehicleResolver(Blackhole bh) throws Exception {
         DataFetcher vehicles = vehicleQuery.getVehicles();
-//        System.out.println(vehicles);
-        bh.consume(vehicles);
+        Object obj = vehicles.get(null);
+//        System.out.println(obj);
+        bh.consume(obj);
+    }
+
+    public String getSchema(){
+        return "type Vehicle{\n" +
+                "        id: ID!,\n" +
+                "        type: String,\n" +
+                "        modelCode: String,\n" +
+                "        brandName: String,\n" +
+                "        launchDate: String\n" +
+                "}\n" +
+                "\n" +
+                "\n" +
+                "type Query {\n" +
+                "        vehicles:[Vehicle]\n" +
+                "        organizations:[Organization]\n" +
+                "}\n" +
+                "\n" +
+                "\n" +
+                "type Organization{\n" +
+                "        id : String,\n" +
+                "        name : String,\n" +
+                "        vehicles : [ID]\n" +
+                "}";
     }
 }

@@ -4,6 +4,7 @@ import com.test.graphql.dao.entity.Organization;
 import com.test.graphql.dao.entity.Vehicle;
 import com.test.graphql.dao.repository.VehicleRepository;
 import graphql.kickstart.tools.GraphQLResolver;
+import graphql.schema.DataFetcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,14 +24,11 @@ public class OrganizationResolver implements GraphQLResolver<Organization> {
         this.vehicleRepository = vehicleRepository;
     }
 
-    public CompletableFuture<List<Vehicle>> vehicles(Organization organization) {
-        return CompletableFuture.supplyAsync(() -> {
+    public DataFetcher vehicles() {
+
+        return dataFetchingEnvironment->{
 //            System.out.println(Thread.currentThread().getName() + " Organization Vehicle Thread Start");
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            Organization organization = dataFetchingEnvironment.getSource();
             List<Integer> vehicleIds = organization.getVehicleIds();
             List<Vehicle> v = new ArrayList<>();
             for (int i = 0; i < vehicleIds.size(); i++) {
@@ -38,7 +36,7 @@ public class OrganizationResolver implements GraphQLResolver<Organization> {
             }
 //            System.out.println(Thread.currentThread().getName() + " Organiation Vehicle Thread End");
             return v;
-        }, executorService);
+        };
     }
 
     public String name(Organization organization){
