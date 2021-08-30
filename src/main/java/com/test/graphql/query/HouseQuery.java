@@ -19,7 +19,6 @@ public class HouseQuery implements GraphQLQueryResolver {
         return this.houseService.getAllHouses(count);
     }
 
-
     public Optional<House> getHouse(final int id) {
         return this.houseService.getHouse(id);
     }

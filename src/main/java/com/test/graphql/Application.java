@@ -4,14 +4,27 @@ import com.test.graphql.context.DataLoaderRegistryFactory;
 import com.test.graphql.dao.entity.Organization;
 import com.test.graphql.dao.entity.Person;
 import com.test.graphql.dao.repository.PersonRepository;
+import com.test.graphql.query.PersonQuery;
+import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.execution.instrumentation.DeferredFieldInstrumentationContext;
+import graphql.execution.instrumentation.ExecutionStrategyInstrumentationContext;
+import graphql.execution.instrumentation.Instrumentation;
+import graphql.execution.instrumentation.InstrumentationContext;
 import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentation;
 import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentationOptions;
+import graphql.execution.instrumentation.parameters.*;
+import graphql.language.Document;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.*;
+import graphql.validation.ValidationError;
 import org.dataloader.BatchLoader;
 import org.dataloader.DataLoader;
 import org.dataloader.DataLoaderRegistry;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -108,8 +121,13 @@ public class Application extends SpringBootServletInitializer {
     @Autowired
     PersonRepository personRepository;
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws IOException, RunnerException {
+//        Options opt = new OptionsBuilder()
+//                .include(PersonQuery.class.getSimpleName())
+//                .forks(2)
+//                .build();
+//        new Runner(opt).run();
+    //    Main.main(args);
         SpringApplication.run(Application.class, args);
     }
 
@@ -136,8 +154,9 @@ public class Application extends SpringBootServletInitializer {
                 .newOptions().includeStatistics(true);
         SchemaGenerator generator = new SchemaGenerator();
         GraphQLSchema graphQLSchema = generator.makeExecutableSchema(typeDefinitionRegistry, runtimeWiring);
-        return GraphQL.newGraphQL(graphQLSchema)
+        GraphQL graphQL = GraphQL.newGraphQL(graphQLSchema)
                 .build();
+        return graphQL;
     }
 
 
